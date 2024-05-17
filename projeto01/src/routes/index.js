@@ -6,9 +6,6 @@ const database = new Database()
 const usersRoutes = new UsersRoutes(database)
 const tasksRoutes = new TasksRoutes(database)
 
-console.log(usersRoutes.build())
-console.log(tasksRoutes.build())
-
 let routes = usersRoutes.build();
 routes = routes.concat(tasksRoutes.build());
 

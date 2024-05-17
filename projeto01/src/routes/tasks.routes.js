@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto'
 import { buildRoutePath } from '../utils/build-route-path.js'
 
+import { processCsvFiles } from '../db/etl/job-to-do.js'
+
 export class TasksRoutes {
 
   constructor(database) {
@@ -23,8 +25,6 @@ export class TasksRoutes {
             updated_at: search,
           } : null)
 
-          console.log(typeof tasks)
-
           return res.end(JSON.stringify(tasks))
         }
       },
@@ -32,27 +32,54 @@ export class TasksRoutes {
         method: 'POST',
         path: buildRoutePath('/tasks'),
         handler: (req, res) => {
-          const {
-            title,
-            description,
-          } = req.body
 
-          if (title === undefined || description === undefined) {
-            return res.writeHead(400).end()
+          if (req.headers['content-type'] === 'application/json') {
+
+            const {
+              title,
+              description,
+            } = req.body
+
+            if (title === undefined || description === undefined) {
+              return res.writeHead(400).end()
+            }
+
+            const task = {
+              id: randomUUID(),
+              title,
+              description,
+              completed_at: null,
+              created_at: new Date().toISOString(),
+              updated_at: null,
+            }
+
+            this.database.insert('tasks', task)
+
+            return res.writeHead(201).end()
+          } else if (req.headers['content-type'].includes('application/xml')) {
+            console.log(req.body)
+            return res.writeHead(201).end()
+          } else if (req.headers['content-type'].includes('text/plain')) {
+            console.log(req.body)
+            return res.writeHead(201).end()
+          } else if (req.headers['content-type'].includes('text/csv')) {
+            console.log(req.body)
+            return res.writeHead(201).end()
+          } else if (req.headers['content-type'].includes('multipart/form-data')) {
+            try {
+              processCsvFiles()
+            } catch {
+              console.log('Error processing file')
+            }
+            return res.writeHead(201).end()
+          } else if (req.headers['content-type'].includes('application/x-www-form-urlencoded')) {
+            console.log(req.body)
+            return res.writeHead(201).end()
+          } else if (req.headers['content-type'].includes('application/octet-stream')) {
+            console.log(req.body)
+          } else {
+            return res.writeHead(415).end()
           }
-
-          const task = {
-            id: randomUUID(),
-            title,
-            description,
-            completed_at: null,
-            created_at: new Date().toISOString(),
-            updated_at: null,
-          }
-
-          this.database.insert('tasks', task)
-
-          return res.writeHead(201).end()
         }
       },
       {
