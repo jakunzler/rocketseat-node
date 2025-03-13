@@ -1,0 +1,13 @@
+{
+  "name": "intro_js",
+  "type": "module",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --watch server.js"
+  },
+  "keywords": [],
+  "author": "Jonas Augusto Kunzler",
+  "license": "ISC",
+  "description": ""
+}
